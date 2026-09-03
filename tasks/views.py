@@ -13,16 +13,16 @@ def home(request):
 
 @login_required(login_url='login')
 def task(request, tid=None):
-    tasks = Task.objects.all()
+    tasks = Task.objects.filter(user=request.user)
 
     if tid == "complete":
-        tasks = Task.objects.filter(completed=True)
+        tasks = Task.objects.filter(user=request.user, completed=True)
 
     elif tid == "incomplete":
-        tasks = Task.objects.filter(completed=False)
+        tasks = Task.objects.filter(user=request.user, completed=False)
 
     elif tid and  tid.isdigit():
-        tasks = Task.objects.filter(id=int(tid))
+        tasks = Task.objects.filter(id=int(tid), user=request.user)
 
     profile_photo = None
     try:
@@ -39,12 +39,15 @@ def task(request, tid=None):
         "profile_photo": profile_photo,
         "display_name": display_name,
     })
+@login_required(login_url='login')
 def postform(request):
     if request.method=='POST':
         form=POSTform(request.POST)
 
         if form.is_valid():
-            form.save()
+            task = form.save(commit=False)
+            task.user = request.user
+            task.save()
 
     else :
         form=POSTform()
@@ -53,15 +56,16 @@ def postform(request):
 
 
 
+@login_required(login_url='login')
 def delete_task(request,tid):
     if request.method == 'POST':
-        Task.objects.filter(id=tid).delete()
+        Task.objects.filter(id=tid, user=request.user).delete()
     return redirect('task')
-    
 
 
+@login_required(login_url='login')
 def update_task(request, tid):
-    task = Task.objects.get(id=tid)
+    task = Task.objects.get(id=tid, user=request.user)
 
     if request.method == 'POST':
         form = POSTform(request.POST, instance=task)

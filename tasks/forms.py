@@ -10,6 +10,7 @@ class POSTform (forms.ModelForm):
     class Meta:
         model= Task
         fields=['title','description','completed']
+        exclude = ['user']
 
 class CreateUserForm(UserCreationForm):
     class Meta:
