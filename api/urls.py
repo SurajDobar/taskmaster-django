@@ -17,6 +17,9 @@ Including another URLconf
 from django.urls import path,include
 from . import views 
 urlpatterns = [
-path('',views.getData),
-path('add/',views.addData),
+path('', views.getData),
+path('<int:pk>/', views.getSingle),
+path('add/', views.addData),
+path('<int:pk>/edit/', views.editData),
+path('<int:pk>/delete/', views.deleteData)
 ]
